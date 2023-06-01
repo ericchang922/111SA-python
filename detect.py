@@ -1,6 +1,9 @@
 import cv2
 import numpy as np
 import time
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+from gevent import pywsgi
 
 # 判断是否是车辆的最小矩形
 min_w = 180
@@ -13,6 +16,28 @@ cars = []
 offset = 8
 # 统计数量
 carno = 0
+
+ambul = 0
+
+ambulance_classifier = cv2.CascadeClassifier('haarcascade_smile.xml')
+
+app = Flask(__name__)
+CORS(app)
+
+#@app.route('/')
+#def convey():
+#    return jsonify(carno)
+
+@app.route('/road-veiw', methods=['POST'])
+def roadVeiw():
+    insertValue = request.get_json()
+    roadId = insertValue['roadId']
+    #data = {
+    #    "carNo": carno,
+    #    "roadLane": 0,
+    #    "roadLength": 0
+    #}
+    return jsonify({"carno":carno})
 
 
 # 计算中心点函数
@@ -78,6 +103,25 @@ else:
                 (x, y) = cpoint
                 #print("cpoint:" + str(cpoint))
 
+                # 救护车检测
+                roi = frame[y:y + h, x:x + w]
+                gray_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+                #ambulances = 0
+                ambulances = ambulance_classifier.detectMultiScale(gray_roi, scaleFactor=1.1, minNeighbors=5)
+                #if(ambulances != 0):
+                #    carno = 9999
+                #else:
+
+                #print(ambulances)
+
+                for (ax, ay, aw, ah) in ambulances:
+                    # 计算救护车中心点在整个图像中的坐标
+                    ax += x
+                    ay += y
+                    cv2.rectangle(frame, (ax, ay), (ax + aw, ay + ah), (0, 0, 255), 2)
+                    # 统计救护车数量
+                    ambul += 1
+
                 for (x, y) in cars:
                     cal = y-line_high
                     if(cal < 0):
@@ -100,7 +144,8 @@ else:
         #print("start:" + str(start))
         key = cv2.waitKey(1)
 
-        if (key == 27 or ((time.time())-start) >= 25.0):
+
+        if (key == 27 or ((time.time()) - start) >= 15.0 or ambul > 0):
             print(("end:" + str(time.time())))
             break
 
@@ -108,4 +153,8 @@ else:
 cap.release()
 # 释放所有窗口
 cv2.destroyAllWindows()
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=3000, debug=False)
 
