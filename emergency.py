@@ -19,7 +19,12 @@ def roadVeiw():
     min_h = 180
     line_high = 800
     emergency = determine(cap, x_right, x_left, min_w, min_h, line_high)
-    return jsonify({"emergency":emergency})
+    return jsonify(
+        {
+            "statusCode": 200,
+            "response": {"emergency":emergency}
+        }
+    )
 
 
 def determine(cap, x_right, x_left, min_w, min_h, line_high):
