@@ -8,8 +8,9 @@ from gevent import pywsgi
 app = Flask(__name__)
 CORS(app)
 
-#@app.route('/')
-#def convey():
+
+# @app.route('/')
+# def convey():
 #    return jsonify(carno)
 
 @app.route('/road-view', methods=['POST'])
@@ -17,13 +18,19 @@ def roadVeiw():
     insertValue = request.get_json()
     roadId = insertValue['roadId']
     carno = whichRoad(roadId)
-    return jsonify({"carno":carno})
+    return jsonify(
+        {
+            "statusCode": 200,
+            "response": {"carno": carno}
+        }
+    )
+
 
 def whichRoad(roadId):
     cars = []
     # 统计数量
     carno = 0
-    #ambulance_classifier = cv2.CascadeClassifier('ambulance.xml')
+    # ambulance_classifier = cv2.CascadeClassifier('ambulance.xml')
     if roadId == 1:
         cap = cv2.VideoCapture('./img/videoooooooo.mp4')
         x_left = 400
@@ -31,7 +38,7 @@ def whichRoad(roadId):
         min_w = 200
         min_h = 200
         line_high = 800
-        #偏移量
+        # 偏移量
         offset = 7
         carno = cal(cap, x_right, x_left, min_w, min_h, line_high, cars, offset)
     elif roadId == 2:
@@ -41,10 +48,12 @@ def whichRoad(roadId):
         min_w = 130
         min_h = 130
         line_high = 570
-        #偏移量
+        # 偏移量
         offset = 3
         carno = cal(cap, x_right, x_left, min_w, min_h, line_high, cars, offset)
     return carno
+
+
 # 计算中心点函数
 def center(x, y, w, h):
     x1 = int(w / 2)
@@ -52,7 +61,6 @@ def center(x, y, w, h):
     cx = x + x1
     cy = y + y1
     return cx, cy
-
 
 
 def cal(cap, x_right, x_left, min_w, min_h, line_high, cars, offset):
@@ -110,8 +118,8 @@ def cal(cap, x_right, x_left, min_w, min_h, line_high, cars, offset):
                     # gray_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
                     # ambulances = ambulance_classifier.detectMultiScale(gray_roi, scaleFactor=1.1, minNeighbors=5)
 
-                    #辨識救護車，但框出來的不是真正的
-                    #如果辨識到救護車會直接回傳carno=9999，這樣就能知道是否有緊急狀況
+                    # 辨識救護車，但框出來的不是真正的
+                    # 如果辨識到救護車會直接回傳carno=9999，這樣就能知道是否有緊急狀況
                     # for (ax, ay, aw, ah) in ambulances:
                     #     # 計算救護車中心點位置
                     #     ax += x
@@ -140,7 +148,7 @@ def cal(cap, x_right, x_left, min_w, min_h, line_high, cars, offset):
 
             key = cv2.waitKey(1)
 
-            if (key == 27 or ((time.time()) - start) >= 15.0 ):
+            if (key == 27 or ((time.time()) - start) >= 15.0):
                 print(("end:" + str(time.time())))
                 break
 
@@ -154,4 +162,3 @@ def cal(cap, x_right, x_left, min_w, min_h, line_high, cars, offset):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=3000, debug=False)
-
