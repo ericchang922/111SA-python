@@ -31,8 +31,8 @@ def whichRoad(roadId):
     # 统计数量
     carno = 0
     # ambulance_classifier = cv2.CascadeClassifier('ambulance.xml')
-    if roadId == 1:
-        cap = cv2.VideoCapture('./img/videoooooooo.mp4')
+    if roadId == 'r01':
+        cap = cv2.VideoCapture('/Users/ericchang/Documents/github/111SA-python/img/videoooooooo.mp4')
         x_left = 400
         x_right = 1500
         min_w = 200
@@ -41,8 +41,8 @@ def whichRoad(roadId):
         # 偏移量
         offset = 7
         carno = cal(cap, x_right, x_left, min_w, min_h, line_high, cars, offset)
-    elif roadId == 2:
-        cap = cv2.VideoCapture('./img/roadddd.mp4')
+    elif roadId == 'r02':
+        cap = cv2.VideoCapture('/Users/ericchang/Documents/github/111SA-python/img/roadddd.mp4')
         x_left = 1300
         x_right = 2050
         min_w = 130
